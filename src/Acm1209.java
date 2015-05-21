@@ -10,10 +10,10 @@ public class Acm1209 {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < n; i++) {
 			num = Integer.parseInt(bReader.readLine());
-			double t = 2 * (num - 1);
-			double sqr = Math.floor(Math.sqrt(t));
+			//double t = 2 * (num - 1);
+			//double sqr = Math.floor(Math.sqrt(t));
 
-			if (sqr * (sqr + 1) == t) {
+			if ((((Math.sqrt(((double)8 * (num)) - 7) - 1) / 2)) % 1 == 0) {
 				sb.append(1).append(" ");
 			} else {
 				sb.append(0).append(" ");
