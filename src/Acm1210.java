@@ -2,19 +2,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Acm1210 {
 	private static BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
 
 	public static void main(String[] args) throws IOException {
-		Integer t, tmp, cost;
+		Integer t, tmp;
+		long cost;
 		Node node = new Node("0.1", null, 0);
 		String val;
 		t = Integer.parseInt(READER.readLine());
 		StringTokenizer st;
+
+		Map<Integer, List<Node>> map = new HashMap<Integer, List<Node>>();
 		for (Integer counter = 1; counter <= t; counter++) {
 			tmp = Integer.parseInt(READER.readLine());
 
@@ -22,75 +26,98 @@ public class Acm1210 {
 				st = new StringTokenizer(READER.readLine());
 				while (!"0".equals(val = st.nextToken())) {
 					cost = Integer.parseInt(st.nextToken());
-					Node temp = new Node(counter.toString(), counter.toString() + "." + counter1.toString(), cost);
+					Node temp = new Node(counter.toString() + "." + counter1.toString(), Integer.valueOf(counter - 1) + "." + val.toString(), cost);
 
-					node.add(counter - 1, Integer.valueOf(counter - 1) + "." + val.toString(), temp);
+					if (map.containsKey(counter)) {
+						map.get(counter).add(temp);
+					} else {
+						List<Node> l = new ArrayList<Acm1210.Node>();
+						l.add(temp);
+						map.put(counter, l);
+					}
+				}
+			}
+			if (counter + 1 <= t) {
+				READER.readLine();
+			}
+		}
+
+		// for (int i : map.keySet()) {
+		// System.out.println(map.get(i));
+		// }
+
+		Long temp, min;
+		min = Long.MAX_VALUE;
+		for (Node n : map.get(t)) {
+			temp = rec(n, map);
+			if (temp < min) {
+				min = temp;
+			}
+		}
+		System.out.println(min);
+	}
+
+	private static long rec(Node node, Map<Integer, List<Node>> map) {
+		if (node.getParentIdentifier().startsWith("0")) {
+			return node.getCost();
+		}
+		String parent = node.getParentIdentifier();
+
+		List<Node> parents = map.get(Integer.parseInt(parent.substring(0, 1)));
+		Long temp, min;
+		min = Long.MAX_VALUE;
+		for (Node n : parents) {
+			if (n.getIdentifier().equals(parent)) {
+				temp = rec(n, map) + node.getCost();
+				if (min > temp) {
+					min = temp;
 				}
 			}
 		}
+
+		return min;
 	}
 
 	private static class Node {
-		private String level;
-
 		private String identifier;
 
-		private List<Node> children;
+		private String parentIdentifier;
 
-		private int cost;
-
-		public List<Node> getChildren() {
-			return children;
-		}
-
-		public void add(int level, String parent, Node temp) {
-			List<Node> tmp = Collections.singletonList(this);
-		}
-
-		public String getLevel() {
-			return level;
-		}
-
-		public void setLevel(String level) {
-			this.level = level;
-		}
-
-		public void setChildren(List<Node> children) {
-			this.children = children;
-		}
-
-		public void setChildren(Node child) {
-			this.children.add(child);
-		}
-
-		public int getCost() {
-			return cost;
-		}
-
-		public void setCost(int cost) {
-			this.cost = cost;
-		}
+		private long cost;
 
 		public String getIdentifier() {
-			return level;
+			return identifier;
 		}
 
 		public void setIdentifier(String identifier) {
-			this.level = identifier;
+			this.identifier = identifier;
+		}
+
+		public String getParentIdentifier() {
+			return parentIdentifier;
+		}
+
+		public void setParentIdentifier(String parentIdentifier) {
+			this.parentIdentifier = parentIdentifier;
+		}
+
+		public long getCost() {
+			return cost;
+		}
+
+		public Node(String identifier, String parentIdentifier, long cost) {
+			super();
+			this.identifier = identifier;
+			this.parentIdentifier = parentIdentifier;
+			this.cost = cost;
 		}
 
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
-			builder.append("Node [level=").append(level).append(", identifier=").append(identifier).append(", children=").append(children).append(", cost=").append(cost).append("]");
+			builder.append("Node [identifier=").append(identifier).append(", parentIdentifier=").append(parentIdentifier).append(", cost=").append(cost).append("]");
 			return builder.toString();
 		}
 
-		public Node(String level, String identifier, int cost) {
-			this.level = level;
-			this.identifier = identifier;
-			this.children = new ArrayList<Acm1210.Node>();
-			this.cost = cost;
-		}
 	}
 }
